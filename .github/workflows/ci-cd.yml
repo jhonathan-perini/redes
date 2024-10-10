@@ -1,0 +1,85 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main  # Altere para a branch desejada
+  pull_request:
+    branches:
+      - main  # Altere para a branch desejada
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: stock_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U user"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./backend
+          push: true
+          tags: your-dockerhub-username/backend:latest
+
+      - name: Build and push frontend image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./frontend
+          push: true
+          tags: your-dockerhub-username/frontend:latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: SSH to VM and deploy
+        uses: appleboy/scp-action@v0.1.0
+        with:
+          host: ${{ secrets.VM_HOST }}  # Endereço IP ou hostname da VM do frontend
+          username: ${{ secrets.VM_USER }}  # Nome de usuário para SSH
+          key: ${{ secrets.VM_SSH_KEY }}  # Chave SSH para autenticação
+          port: 22
+          source: "frontend/dist/*"
+          target: "/path/to/your/frontend"  # Caminho na VM onde o frontend será hospedado
+
+      - name: SSH to VM and deploy backend
+        uses: appleboy/ssh-action@v0.1.0
+        with:
+          host: ${{ secrets.BACKEND_VM_HOST }}  # Endereço IP ou hostname da VM do backend
+          username: ${{ secrets.BACKEND_VM_USER }}  # Nome de usuário para SSH
+          key: ${{ secrets.BACKEND_VM_SSH_KEY }}  # Chave SSH para autenticação
+          port: 22
+          script: |
+            docker pull your-dockerhub-username/backend:latest
+            docker stop backend_container || true
+            docker rm backend_container || true
+            docker run -d --name backend_container --network host your-dockerhub-username/backend:latest
+
+            # Se você estiver usando docker-compose, substitua os comandos acima pelo comando docker-compose up.
