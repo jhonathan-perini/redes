@@ -23,23 +23,31 @@ jobs:
         run: |
           ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
-      - name: List SSH Keys
+      - name: Install Ngrok on Frontend VM
         run: |
-          ls -la ~/.ssh
-          cat ~/.ssh/id_rsa
+          ssh -o StrictHostKeyChecking=no -t ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+            if ! command -v ngrok &> /dev/null; then
+              echo "Ngrok not found. Installing..."
+              wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz -O ngrok.tgz
+              tar -xvzf ngrok.tgz -C /usr/local/bin/
+              rm ngrok.tgz
+              echo "Ngrok installed successfully."
+            else
+              echo "Ngrok is already installed."
+            fi
+          EOF
 
       - name: Start Ngrok on Frontend VM
         run: |
           ssh -o StrictHostKeyChecking=no -t ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} 'nohup ngrok http 5173 &'
 
       - name: Wait for Ngrok to be Ready
-        run: sleep 10  # Dê um tempo para o Ngrok iniciar e o URL ser gerado
+        run: sleep 10  # Dê tempo para o Ngrok iniciar
 
       - name: Get Ngrok URL
         id: ngrok
         run: |
-          # Obtém o URL público do Ngrok
-          curl -s http://localhost:4040/api/tunnels | jq -r '.tunnels[0].public_url'
+          ssh -o StrictHostKeyChecking=no -t ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} 'curl -s http://localhost:4040/api/tunnels | jq -r ".tunnels[0].public_url"'
 
       - name: Deploy Frontend
         uses: appleboy/scp-action@v0.1.0
@@ -48,8 +56,8 @@ jobs:
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
           port: 22
-          source: "./frontend/*"  # Ajuste para o caminho correto dos arquivos do frontend
-          target: "/home/john/frontend"  # Caminho na VM onde os arquivos do frontend serão hospedados
+          source: "./frontend/*"
+          target: "/home/john/frontend"
 
       - name: Deploy Frontend and Trigger Backend Deploy
         uses: appleboy/ssh-action@v0.1.0
@@ -58,17 +66,13 @@ jobs:
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
-            # Subir o frontend
-            cd /home/john/frontend  # Caminho corrigido
+            cd /home/john/frontend
             docker-compose down || true
             docker-compose up -d --build
 
-            # Conectar na VM do backend e fazer o deploy
             ssh -o StrictHostKeyChecking=no ${{ secrets.BACKEND_VM_USER }}@${{ secrets.BACKEND_VM_IP }} << 'EOF'
-              # Copiar arquivos do frontend para o backend
-              scp -o StrictHostKeyChecking=no -r ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/frontend/* /home/john/backend/  # Ajuste o caminho conforme necessário
-
-              cd /home/john/backend  # Caminho corrigido
+              scp -o StrictHostKeyChecking=no -r ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/frontend/* /home/john/backend/
+              cd /home/john/backend
               docker-compose down || true
               docker-compose up -d --build
             EOF
