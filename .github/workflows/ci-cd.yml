@@ -25,6 +25,12 @@ jobs:
 
       - name: Deploy Frontend
         run: |
+          # Criar o diretório de destino na VM
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+            mkdir -p /home/john/frontend/public
+          EOF
+
+          # Copiar os arquivos do frontend
           scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ./frontend/src/* ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/frontend/
           scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ./frontend/public/* ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/frontend/public/
 
@@ -38,6 +44,9 @@ jobs:
 
             # Conectar na VM do backend e fazer o deploy
             ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.BACKEND_VM_USER }}@${{ secrets.BACKEND_VM_IP }} << 'BACKEND_EOF'
+              # Criar o diretório de destino no backend
+              mkdir -p /home/john/backend
+
               # Copiar arquivos do frontend para o backend
               scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/frontend/* /home/john/backend/
 
@@ -49,4 +58,4 @@ jobs:
 
       - name: Notify Deployment
         run: |
-          echo "Frontend is live "
+          echo "Frontend is live at: ${{ steps.ngrok.outputs.result }}"
