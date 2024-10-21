@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up SSH Key for Frontend VM
         run: |
@@ -30,7 +30,7 @@ jobs:
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
           port: 22
-          source: "../frontend/*"  # Ajuste para o caminho correto dos arquivos do frontend
+          source: "/frontend/*"  # Ajuste para o caminho correto dos arquivos do frontend
           target: "/home/john/frontend"  # Caminho na VM onde os arquivos do frontend serão hospedados
 
       - name: Deploy Frontend and Trigger Backend Deploy
