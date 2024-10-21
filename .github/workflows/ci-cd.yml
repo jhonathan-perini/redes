@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on:
   push:
@@ -6,14 +6,57 @@ on:
       - master
 
 jobs:
-  build:
+  deploy:
     runs-on: self-hosted
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Executar comandos
+      - name: Set up SSH Key for Frontend VM
         run: |
-          echo "Executando comandos na VM local!"
-          # Adicione os comandos que você deseja executar
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+      - name: Add Frontend VM to Known Hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+
+     
+
+      - name: Deploy Frontend
+        uses: appleboy/scp-action@v0.1.0
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          port: 22
+          source: "./frontend/*"  # Ajuste para o caminho correto dos arquivos do frontend
+          target: "/home/john/frontend"  # Caminho na VM onde os arquivos do frontend serão hospedados
+
+      - name: Deploy Frontend and Trigger Backend Deploy
+        uses: appleboy/ssh-action@v0.1.0
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            # Subir o frontend
+            cd /home/john/frontend  # Caminho corrigido
+            docker-compose down || true
+            docker-compose up -d --build
+
+            # Conectar na VM do backend e fazer o deploy
+            ssh -o StrictHostKeyChecking=no ${{ secrets.BACKEND_VM_USER }}@${{ secrets.BACKEND_VM_IP }} << 'EOF'
+              # Copiar arquivos do frontend para o backend
+              scp -o StrictHostKeyChecking=no -r ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/frontend/* /home/john/backend/  # Ajuste o caminho conforme necessário
+
+              cd /home/john/backend  # Caminho corrigido
+              docker-compose down || true
+              docker-compose up -d --build
+            EOF
+
+      - name: Notify Deployment
+        run: |
+          echo "Frontend is live at: ${{ steps.ngrok.outputs.result }}"
