@@ -23,20 +23,14 @@ jobs:
         run: |
           ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
+      - name: List SSH Keys
+        run: |
+          ls -la ~/.ssh
+          cat ~/.ssh/id_rsa
+
       - name: Start Ngrok on Frontend VM
         run: |
-          # Inicia o Ngrok na VM do frontend para expor a aplicação
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-            # Instala Ngrok se necessário
-            if ! command -v ngrok &> /dev/null; then
-              # Comando para instalar o Ngrok (ajuste conforme necessário)
-              sudo apt-get update
-              sudo apt-get install -y ngrok-client
-            fi
-
-            # Inicia o Ngrok em segundo plano na porta padrão do Vite (5173)
-            nohup ngrok http 5173 > ngrok.log &  # Ajuste a porta conforme necessário
-          EOF
+          ssh -o StrictHostKeyChecking=no -t ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} 'nohup ngrok http 5173 &'
 
       - name: Wait for Ngrok to be Ready
         run: sleep 10  # Dê um tempo para o Ngrok iniciar e o URL ser gerado
