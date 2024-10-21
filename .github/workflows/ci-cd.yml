@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: self-hosted  # Indica que o job deve rodar no runner self-hosted
 
     steps:
       - name: Check out code
@@ -23,39 +23,28 @@ jobs:
         run: |
           ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
-     
-
       - name: Deploy Frontend
-        uses: appleboy/scp-action@v0.1.0
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
-          port: 22
-          source: "./frontend/*"  # Ajuste para o caminho correto dos arquivos do frontend
-          target: "/home/john/frontend"  # Caminho na VM onde os arquivos do frontend serão hospedados
+        run: |
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ./frontend/* ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/frontend/
 
       - name: Deploy Frontend and Trigger Backend Deploy
-        uses: appleboy/ssh-action@v0.1.0
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
-          script: |
+        run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
             # Subir o frontend
             cd /home/john/frontend  # Caminho corrigido
             docker-compose down || true
             docker-compose up -d --build
 
             # Conectar na VM do backend e fazer o deploy
-            ssh -o StrictHostKeyChecking=no ${{ secrets.BACKEND_VM_USER }}@${{ secrets.BACKEND_VM_IP }} << 'EOF'
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.BACKEND_VM_USER }}@${{ secrets.BACKEND_VM_IP }} << 'BACKEND_EOF'
               # Copiar arquivos do frontend para o backend
-              scp -o StrictHostKeyChecking=no -r ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/frontend/* /home/john/backend/  # Ajuste o caminho conforme necessário
+              scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/frontend/* /home/john/backend/
 
               cd /home/john/backend  # Caminho corrigido
               docker-compose down || true
               docker-compose up -d --build
-            EOF
+            BACKEND_EOF
+          EOF
 
       - name: Notify Deployment
         run: |
