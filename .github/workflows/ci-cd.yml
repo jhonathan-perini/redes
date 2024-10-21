@@ -1,4 +1,4 @@
-name: CI/CD
+name: CI
 
 on:
   push:
@@ -6,77 +6,14 @@ on:
       - master
 
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: self-hosted
 
     steps:
       - name: Check out code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
-      - name: Set up SSH Key for Frontend VM
+      - name: Executar comandos
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-
-      - name: Add Frontend VM to Known Hosts
-        run: |
-          ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Install Ngrok on Frontend VM
-        run: |
-          ssh -o StrictHostKeyChecking=no -t ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-            if ! command -v ngrok &> /dev/null; then
-              echo "Ngrok not found. Installing..."
-              wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz -O ngrok.tgz
-              tar -xvzf ngrok.tgz -C /usr/local/bin/
-              rm ngrok.tgz
-              echo "Ngrok installed successfully."
-            else
-              echo "Ngrok is already installed."
-            fi
-          EOF
-
-      - name: Start Ngrok on Frontend VM
-        run: |
-          ssh -o StrictHostKeyChecking=no -t ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} 'nohup ngrok http 5173 &'
-
-      - name: Wait for Ngrok to be Ready
-        run: sleep 10  # Dê tempo para o Ngrok iniciar
-
-      - name: Get Ngrok URL
-        id: ngrok
-        run: |
-          ssh -o StrictHostKeyChecking=no -t ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} 'curl -s http://localhost:4040/api/tunnels | jq -r ".tunnels[0].public_url"'
-
-      - name: Deploy Frontend
-        uses: appleboy/scp-action@v0.1.0
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
-          port: 22
-          source: "./frontend/*"
-          target: "/home/john/frontend"
-
-      - name: Deploy Frontend and Trigger Backend Deploy
-        uses: appleboy/ssh-action@v0.1.0
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
-          script: |
-            cd /home/john/frontend
-            docker-compose down || true
-            docker-compose up -d --build
-
-            ssh -o StrictHostKeyChecking=no ${{ secrets.BACKEND_VM_USER }}@${{ secrets.BACKEND_VM_IP }} << 'EOF'
-              scp -o StrictHostKeyChecking=no -r ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/frontend/* /home/john/backend/
-              cd /home/john/backend
-              docker-compose down || true
-              docker-compose up -d --build
-            EOF
-
-      - name: Notify Deployment
-        run: |
-          echo "Frontend is live at: ${{ steps.ngrok.outputs.result }}"
+          echo "Executando comandos na VM local!"
+          # Adicione os comandos que você deseja executar
