@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .  # Define o contexto como o diretório atual (backend)
+      dockerfile: Dockerfile  # Indica qual Dockerfile usar
+    ports:
+      - "5000:5000"  # Mapeia a porta 5000 do container para a porta 5000 do host
+    environment:
+      POSTGRES_URI: postgres://user:password@db:5432/yourdbname  # Configuração do banco de dados
+    depends_on:
+      - db  # Garante que o serviço de banco de dados inicie antes do backend
+
+  db:
+    image: postgres:13  # Utiliza a imagem oficial do PostgreSQL
+    restart: always  # Reinicia sempre que o container parar
+    environment:
+      POSTGRES_USER: user  # Nome de usuário do banco de dados
+      POSTGRES_PASSWORD: password  # Senha do banco de dados
+      POSTGRES_DB: yourdbname  # Nome do banco de dados
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Persistência de dados
+
+volumes:
+  postgres_data:  # Volume para armazenar os dados do PostgreSQL

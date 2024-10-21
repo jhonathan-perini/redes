@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api'; // URL do seu backend
+const API_URL = 'http://192.168.56.101:5000/api'; // URL do seu backend
 
 export const getItems = async () => {
   const response = await axios.get(`${API_URL}/inventory`);
