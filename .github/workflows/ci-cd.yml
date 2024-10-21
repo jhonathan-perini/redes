@@ -31,8 +31,8 @@ jobs:
           EOF
 
           # Copiar os arquivos do frontend
-          scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ./frontend/src/* ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/frontend/
-          scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ./frontend/public/* ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/frontend/public/
+          scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ./frontend/* ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/frontend/
+
 
       - name: Deploy Frontend and Trigger Backend Deploy
         run: |
