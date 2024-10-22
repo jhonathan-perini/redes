@@ -37,7 +37,7 @@ jobs:
       #   run: |
       #     ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
       #       # Subir o frontend
-      #       cd /home/john/frontend  # Caminho corrigido
+      #       cd /home/john/frontend  # Caminho corrigido 
       #       docker-compose down || true
       #       docker-compose up -d --build
 
