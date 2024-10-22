@@ -36,7 +36,7 @@ jobs:
       #       # Subir o frontend
       #       cd /home/john/frontend  # Caminho corrigido 
       #       docker-compose down || true
-      #       docker-compose up -d --build
+      #       docker-compose up -d --build 
 
       #       # Conectar na VM do backend e fazer o deploy
       #       ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.BACKEND_VM_USER }}@${{ secrets.BACKEND_VM_IP }} << 'BACKEND_EOF'
