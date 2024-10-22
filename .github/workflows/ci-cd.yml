@@ -27,7 +27,8 @@ jobs:
         run: |
               # Criar o diretório de destino na VM
               ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-                mkdir -p /home/john/redes
+                 sudo mkdir -p /home/john/redes
+                 sudo chown -R $USER:$USER /home/john
               EOF
     
               # Copiar os arquivos do frontend
