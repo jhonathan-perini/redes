@@ -7,7 +7,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted  # Indica que o job deve rodar no runner self-hosted
+    runs-on: self-hosted  # Runner self-hosted
 
     steps:
       - name: Check out code
@@ -21,19 +21,16 @@ jobs:
 
       - name: Add Frontend VM to Known Hosts
         run: |
-            ssh-keyscan -p 22 -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -p 2222 -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
       - name: Deploy Frontend
         run: |
-              # Criar o diretório de destino na VM
-              ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-                 sudo mkdir -p /home/john/redes
-                 sudo chown -R $USER:$USER /home/john
-              EOF
-    
-              # Copiar os arquivos do frontend
-              scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ./ ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/redes
-      # - name: Deploy Frontend and Trigger Backend Deploy
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 2222 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+            mkdir -p /home/john/redes
+          EOF
+
+          scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 2222 ./ ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/redes
+   # - name: Deploy Frontend and Trigger Backend Deploy
       #   run: |
       #     ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
       #       # Subir o frontend
