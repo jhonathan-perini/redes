@@ -12,23 +12,24 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
-      - name: Set up SSH Key for Frontend VM
-        run: |
-              mkdir -p ~/.ssh
-              echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_rsa
-              chmod 600 ~/.ssh/id_rsa
+      # - name: Set up SSH Key for Frontend VM
+      #   run: |
+      #         mkdir -p ~/.ssh
+      #         echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_rsa
+      #         chmod 600 ~/.ssh/id_rsa
 
-      - name: Add Frontend VM to Known Hosts
-        run: |
-              ssh-keyscan -p 22 -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+      # - name: Add Frontend VM to Known Hosts
+      #   run: |
+      #         ssh-keyscan -p 22 -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy Frontend
-        run: |
-              ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-                mkdir -p /home/john/redes
-              EOF
+      # - name: Deploy Frontend
+      #   run: |
+      #         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+      #           mkdir -p /home/john/redes
+      #         EOF
 
-              scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ./ ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/redes
+      #         scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ./ ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/redes
+
       - name: Build Backend Docker Image on Frontend VM
         run: |
           echo "Conectando à VM do frontend..."
