@@ -55,7 +55,7 @@ jobs:
                 gunzip -c backend_db.tar.gz | docker load
                 echo "Executando o container..."
                 docker run -d --name backend_container -p 80:80 backend_image:latest
-                docker run -d --name db_container -p 80:80 backend_db:latest
+                docker run -d --name db_container -p 5432:5432 backend_db:latest
               BACKEND_EOF
               "@
         
