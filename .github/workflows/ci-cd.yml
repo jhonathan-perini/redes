@@ -19,18 +19,18 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@127.0.0.1 << EOF
             
             echo "Construindo a imagem Docker do backend..."
+    
+            echo "Gerando build TAR do backend no frontend..."
             cd /home/redes/redes/backend
-            docker build -t backend_image:latest .
+            tar -czf backend.tar.gz .
 
-            echo "Salvando a imagem como .tar..."
-            docker save backend_image:latest | gzip > backend_image.tar.gz
+           
             
-            echo "${{ secrets.FRONTEND_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+            
+            echo "" | tr -d '\r' > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
             echo "Criando diretório no backend..."
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@192.168.56.102 << 'BACKEND_EOF'
-              mkdir -p /home/redes/backend
-            BACKEND_EOF
+          
 
             echo "Transferindo imagem para o backend..."
             scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 backend_image.tar.gz redes@192.168.56.102:/home/redes/backend/
