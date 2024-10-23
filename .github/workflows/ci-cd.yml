@@ -13,15 +13,17 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
       
-      - name: Deploy Frontend
-        shell: bash
+      - name: Deploy usando PowerShell
         run: |
-              ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 2222 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-                mkdir -p /home/john/redes
-              EOF
-
-              scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 2222 ./ ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/redes
-
+          $sshCommand = "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 2222"
+          $scpCommand = "scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 2222"
+      
+          # Executar SSH para criar diretório na VM
+          Invoke-Expression "$sshCommand ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} 'mkdir -p /home/john/redes'"
+      
+          # Transferir arquivos usando SCP
+          Invoke-Expression "$scpCommand ./ ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/redes"
+      
       # - name: Build Backend Docker Image on Frontend VM
       #   run: |
       #     echo "Conectando à VM do frontend..."
