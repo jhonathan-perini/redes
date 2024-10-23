@@ -27,7 +27,7 @@ jobs:
            
             
             
-            echo "" | tr -d '\r' > ~/.ssh/id_rsa
+            echo "${{ secrets.FRONTEND_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
             echo "Criando diretório no backend..."
           
