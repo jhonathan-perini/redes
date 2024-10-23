@@ -12,36 +12,56 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
+      - name: Set up SSH Key for Frontend VM
+        run: |
+              mkdir -p ~/.ssh
+              echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_rsa
+              chmod 600 ~/.ssh/id_rsa
 
+      - name: Add Frontend VM to Known Hosts
+        run: |
+              ssh-keyscan -p 22 -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy Frontend
+        run: |
+              ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+                mkdir -p /home/redes/redes
+              EOF
+
+              scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ./ ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/redes/redes
       - name: Build Backend Docker Image on Frontend VM
         run: |
           echo "Conectando à VM do frontend..."
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@127.0.0.1 << EOF
             
             echo "Construindo a imagem Docker do backend..."
-    
-            echo "Gerando build TAR do backend no frontend..."
             cd /home/redes/redes/backend
-            tar -czf backend.tar.gz .
+            docker build -t backend_image:latest .
+
+            echo "Salvando a imagem como .tar..."
+            docker save backend_image:latest | gzip > backend_image.tar.gz
 
            
-            
-            
             echo "${{ secrets.FRONTEND_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
             chmod 600 ~/.ssh/id_rsa
-            echo "Criando diretório no backend..."
+            
           
-
+            echo "Criando diretório no backend..."
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@192.168.56.102 << 'BACKEND_EOF'
+              mkdir -p /home/redes/backend
+            BACKEND_EOF
             echo "Transferindo imagem para o backend..."
             scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 backend_image.tar.gz redes@192.168.56.102:/home/redes/backend/
             
             echo "Carregando e subindo o backend..."
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@192.168.56.102 << 'BACKEND_EOF'
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@192.168.56.102 << 'BACKEND_EOF2'
               cd /home/redes/backend
               gunzip -c backend_image.tar.gz | docker load
 
-              echo "Executando o container..."
-              docker-compose down || true
-              docker-compose up -d
-            BACKEND_EOF
+            docker stop backend_container || true
+            docker rm backend_container || true
+
+            echo "Executando o novo container..."
+            docker run -d --name backend_container -p 80:80 backend_image
+            BACKEND_EOF2
           EOF

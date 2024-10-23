@@ -1,16 +1,15 @@
-// src/App.jsx
-
+// src/App.js
 import React from 'react';
-import Inventory from './components/Inventory';
-import Transaction from './components/Transaction';
 
-const App = () => {
+function App() {
   return (
-    <div>
-      <Inventory />
-      <Transaction />
+    <div className="App">
+      <header className="App-header">
+        <h1>Bem-vindo ao Meu Projeto React!</h1>
+        <p>Esta é uma aplicação básica utilizando React 18.</p>
+      </header>
     </div>
   );
-};
+}
 
 export default App;
