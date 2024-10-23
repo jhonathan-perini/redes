@@ -7,35 +7,39 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted  # Runner self-hosted
+    runs-on: self-hosted
 
     steps:
       - name: Check out code
         uses: actions/checkout@v3
-        
-      - name: Deploy Frontend and Trigger Backend Deploy
+
+      - name: Build Backend Docker Image on Frontend VM
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} <<EOF
-            echo "Iniciando deploy do frontend..."
-           
-            # Navega para o diretório do frontend se necessário
-            cd /home/redes/redes/frontend
+          echo "Conectando à VM do frontend..."
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@127.0.0.1 << 'FRONTEND_EOF'
+            
+            echo "Construindo a imagem Docker do backend..."
+            cd /home/redes/redes/backend
+            docker build -t backend_image:latest .
 
-            # Subir o frontend
-            docker-compose down || true
-            docker-compose up -d --build
+            echo "Salvando a imagem como .tar..."
+            docker save backend_image:latest | gzip > backend_image.tar.gz
 
-            echo "Conectando ao backend..."
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.BACKEND_VM_USER }}@${{ secrets.BACKEND_VM_IP }} << 'BACKEND_EOF'
-              echo "Criando diretório no backend..."
+            echo "Criando diretório no backend..."
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@$192.168.56.102 << 'BACKEND_EOF'
               mkdir -p /home/redes/backend
-      
-              echo "Copiando arquivos do frontend para o backend..."
-              scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/redes/redes/backend/* /home/redes/backend/
-      
-              echo "Subindo o backend..."
-              cd /home/redes/backend
-              docker-compose down || true
-              docker-compose up -d --build
             BACKEND_EOF
-          EOF
+
+            echo "Transferindo imagem para o backend..."
+            scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 backend_image.tar.gz redes@$192.168.56.102:/home/redes/backend/
+            
+            echo "Carregando e subindo o backend..."
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@$192.168.56.102 << 'BACKEND_EOF'
+              cd /home/redes/backend
+              gunzip -c backend_image.tar.gz | docker load
+
+              echo "Executando o container..."
+              docker-compose down || true
+              docker-compose up -d
+            BACKEND_EOF
+          FRONTEND_EOF
