@@ -12,40 +12,29 @@ jobs:
     steps:
       - name: Check out code
         uses: actions/checkout@v3
-
-      # - name: Set up SSH Key for Frontend VM
-      #   run: |
-      #     mkdir -p ~/.ssh
-      #     echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_rsa
-      #     chmod 600 ~/.ssh/id_rsa
-
-      # - name: Add Frontend VM to Known Hosts
-      #   run: |
-      #     ssh-keyscan -p 22 -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
-
-      # - name: Deploy Frontend
-      #   run: |
-      #     ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-      #       mkdir -p /home/redes/redes
-      #     EOF
-
-      #     scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ./ ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/redes/redes
+        
       - name: Deploy Frontend and Trigger Backend Deploy
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} <<EOF
             echo "Iniciando deploy do frontend..."
            
-      
+            # Navega para o diretório do frontend se necessário
+            cd /home/redes/redes/frontend
+
+            # Subir o frontend
+            docker-compose down || true
+            docker-compose up -d --build
+
             echo "Conectando ao backend..."
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.BACKEND_VM_USER }}@${{ secrets.BACKEND_VM_IP }} <<'BACKEND_EOF'
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.BACKEND_VM_USER }}@${{ secrets.BACKEND_VM_IP }} << 'BACKEND_EOF'
               echo "Criando diretório no backend..."
               mkdir -p /home/redes/backend
       
               echo "Copiando arquivos do frontend para o backend..."
-              scp  -P 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/redes/redes/backend/* /home/redes/backend/
+              scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/redes/redes/backend/* /home/redes/backend/
       
               echo "Subindo o backend..."
-              cd /home/redes/backend  # Caminho corrigido
+              cd /home/redes/backend
               docker-compose down || true
               docker-compose up -d --build
             BACKEND_EOF
