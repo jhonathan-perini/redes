@@ -1,0 +1,13 @@
+# Usando a imagem oficial do PostgreSQL como base
+FROM postgres:13
+
+# Copie os scripts de inicialização para o diretório de inicialização do PostgreSQL
+COPY ./init-scripts /docker-entrypoint-initdb.d/
+
+# Defina variáveis de ambiente para configuração do banco de dados
+ENV POSTGRES_USER=user
+ENV POSTGRES_PASSWORD=password
+ENV POSTGRES_DB=yourdbname
+
+# Exponha a porta do PostgreSQL
+EXPOSE 5432
