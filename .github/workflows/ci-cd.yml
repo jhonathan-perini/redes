@@ -49,6 +49,8 @@ jobs:
               docker-compose up -d
               "@
         
+              # Remover caracteres de retorno de carro
+              $commands = $commands -replace "`r", ""
               # Executando os comandos na VM do Frontend
               $sshCommand = "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 2222 redes@127.0.0.1"
               Invoke-Expression "$sshCommand '$commands'"
