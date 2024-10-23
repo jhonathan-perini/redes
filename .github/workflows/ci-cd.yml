@@ -18,11 +18,12 @@ jobs:
           $sshCommand = "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 2222"
           $scpCommand = "scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 2222"
       
-          # Executar SSH para criar diretório na VM
-          Invoke-Expression "$sshCommand ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} 'mkdir -p /home/john/redes'"
-      
+  
+          # Remover o diretório na VM antes de copiar
+          Invoke-Expression "$sshCommand ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} 'rm -rf /home/john/redes && mkdir -p /home/john/redes'"
+
           # Transferir arquivos usando SCP
-          Invoke-Expression "$scpCommand -r ./ ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/redes"
+          Invoke-Expression "$scpCommand  ./ ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/redes"
       
       - name: Build Backend Docker Image on Frontend VM
         run: |
@@ -35,4 +36,5 @@ jobs:
             "@
 
             # Executando os comandos na VM do Frontend
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 2222 redes@127.0.0.1 $commands
+            $sshCommand = "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 2222"
+            Invoke-Expression "$sshCommand redes@127.0.0.1 '$commands'"
