@@ -34,9 +34,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << EOF
             # Subir o frontend
-            cd /home/redes/redes/frontend  # Caminho corrigido
-            docker-compose down || true
-            docker-compose up -d --build
+      
 
             # Conectar na VM do backend e fazer o deploy
             ssh -o StrictHostKeyChecking=no -p 22 ${{ secrets.BACKEND_VM_USER }}@${{ secrets.BACKEND_VM_IP }} << BACKEND_EOF
@@ -45,7 +43,6 @@ jobs:
 
               # Copiar arquivos do frontend para o backend
               scp -o StrictHostKeyChecking=no -P 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/redes/redes/backend/* /home/redes/backend/
-
               cd /home/redes/backend  # Caminho corrigido
               docker-compose down || true
               docker-compose up -d --build
