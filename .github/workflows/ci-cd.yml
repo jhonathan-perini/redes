@@ -16,7 +16,7 @@ jobs:
       - name: Build Backend Docker Image on Frontend VM
         run: |
           echo "Conectando à VM do frontend..."
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@127.0.0.1 << 'FRONTEND_EOF'
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@127.0.0.1 << EOF
             
             echo "Construindo a imagem Docker do backend..."
             cd /home/redes/redes/backend
@@ -24,7 +24,9 @@ jobs:
 
             echo "Salvando a imagem como .tar..."
             docker save backend_image:latest | gzip > backend_image.tar.gz
-
+            
+            echo "${{ secrets.FRONTEND_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+            chmod 600 ~/.ssh/id_rsa
             echo "Criando diretório no backend..."
             ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@192.168.56.102 << 'BACKEND_EOF'
               mkdir -p /home/redes/backend
@@ -42,4 +44,4 @@ jobs:
               docker-compose down || true
               docker-compose up -d
             BACKEND_EOF
-          FRONTEND_EOF
+          EOF
