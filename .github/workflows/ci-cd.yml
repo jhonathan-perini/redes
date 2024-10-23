@@ -28,7 +28,7 @@ jobs:
       - name: Build Backend Docker Image on Frontend VM
         run: |
             # Comandos a serem executados na VM do Frontend
-            $commands = @"
+            $commands = @" 
             echo "Construindo a imagem Docker do backend..."
             cd /home/john/redes/frontend  # Caminho corrigido 
             docker-compose down || true
