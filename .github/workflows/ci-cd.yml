@@ -33,7 +33,7 @@ jobs:
               cd /home/john/redes/backend
               docker build -t backend_image:latest .
               echo "Construindo a imagem Docker do db..."
-              docker build -t backend_db -f Dockerfile.db 
+              docker build -t backend_db -f Dockerfile.db . 
               echo "Salvando as imagens como .tar..."
               docker save backend_image:latest | gzip > backend_image.tar.gz
               docker save backend_db:latest | gzip > backend_db.tar.gz
