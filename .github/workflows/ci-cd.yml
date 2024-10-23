@@ -35,7 +35,7 @@ jobs:
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@127.0.0.1 << EOF
             
             echo "Construindo a imagem Docker do backend..."
-            cd /home/redes/backend
+            cd /home/john/redes/backend
             docker build -t backend_image:latest .
 
             echo "Salvando a imagem como .tar..."
