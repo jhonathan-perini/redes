@@ -38,7 +38,7 @@ jobs:
             "@
 
             # Salvando os comandos em um arquivo temporário com a codificação correta
-            $tempFile = "C:\Temp\commands.sh"
+            $tempFile = "C:\Users\jperini\OneDrive - Padtec\Documents\commands.sh"
             $commands | Out-File -FilePath $tempFile -Encoding utf8
 
             # Alternativa sem redirecionamento
