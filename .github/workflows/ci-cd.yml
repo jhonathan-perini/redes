@@ -29,6 +29,7 @@ jobs:
             # Comandos a serem executados na VM do Frontend
             $commands = @"
             echo "Construindo a imagem Docker do backend..."
+            mkdir -p /home/john/redes/backend
             cd /home/john/redes/backend
 
             echo "Salvando a imagem como .tar..."
