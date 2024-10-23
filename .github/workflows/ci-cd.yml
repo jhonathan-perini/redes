@@ -37,7 +37,7 @@ jobs:
            
       
             echo "Conectando ao backend..."
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.BACKEND_VM_USER }}@${{ secrets.BACKEND_VM_IP }} <<'BACKEND_EOF'
+            ssh -o StrictHostKeyChecking=no  -p 22 ${{ secrets.BACKEND_VM_USER }}@${{ secrets.BACKEND_VM_IP }} <<'BACKEND_EOF'
               echo "Criando diretório no backend..."
               mkdir -p /home/redes/backend
       
