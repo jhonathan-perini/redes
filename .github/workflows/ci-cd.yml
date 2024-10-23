@@ -30,7 +30,7 @@ jobs:
               # Comandos a serem executados na VM do Frontend
               $commands = @"
               echo "Construindo a imagem Docker do backend..."
-              cd /home/john/redes/frontend  # Caminho corrigido
+              cd /home/john/redes/frontend
               docker-compose down || true
               docker-compose up -d --build
               echo "Construindo a imagem Docker do backend..."
