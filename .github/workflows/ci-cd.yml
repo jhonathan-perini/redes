@@ -47,7 +47,8 @@ jobs:
               gunzip -c backend_image.tar.gz | docker load
               echo "Executando o container..."
               docker-compose down || true
-              docker-compose up -d"@
+              docker-compose up -d
+              "@
         
               # Executando os comandos na VM do Frontend
               $sshCommand = "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 2222 redes@127.0.0.1"
