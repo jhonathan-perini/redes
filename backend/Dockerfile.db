@@ -2,7 +2,7 @@
 FROM postgres:13
 
 # Copie os scripts de inicialização para o diretório de inicialização do PostgreSQL
-COPY ./init-scripts /docker-entrypoint-initdb.d/
+
 
 # Defina variáveis de ambiente para configuração do banco de dados
 ENV POSTGRES_USER=user
