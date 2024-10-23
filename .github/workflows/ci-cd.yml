@@ -46,10 +46,7 @@ jobs:
             chmod 600 ~/.ssh/id_rsa
             
           
-            echo "Criando diretório no backend..."
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@192.168.56.102 << 'BACKEND_EOF'
-              mkdir -p /home/redes/backend
-            BACKEND_EOF
+         
             echo "Transferindo imagem para o backend..."
             scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 backend_image.tar.gz redes@192.168.56.102:/home/redes/backend/
             
