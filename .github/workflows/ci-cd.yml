@@ -25,10 +25,10 @@ jobs:
       - name: Deploy Frontend
         run: |
               ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-                mkdir -p /home/redes/
+                mkdir -p /home/john/redes
               EOF
 
-              scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ./ ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/redes
+              scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ./ ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/redes
       - name: Build Backend Docker Image on Frontend VM
         run: |
           echo "Conectando à VM do frontend..."
