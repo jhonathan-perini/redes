@@ -37,10 +37,10 @@ jobs:
             
             echo "Construindo a imagem Docker do backend..."
             cd /home/john/redes/backend
-            docker build -t backend_image:latest .
+            
 
             echo "Salvando a imagem como .tar..."
-            docker save backend_image:latest | gzip > backend_image.tar.gz
+           
 
            
             echo "${{ secrets.FRONTEND_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
@@ -49,17 +49,15 @@ jobs:
           
          
             echo "Transferindo imagem para o backend..."
-            scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 backend_image.tar.gz redes@192.168.56.102:/home/redes/backend/
             
             echo "Carregando e subindo o backend..."
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@192.168.56.102 << BACKEND_EOF
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@192.168.56.102 << 'BACKEND_EOF'
               cd /home/redes/backend
-              gunzip -c backend_image.tar.gz | docker load
 
               docker stop backend_container || true
               docker rm backend_container || true
 
               echo "Executando o novo container..."
               docker run -d --name backend_container -p 80:80 backend_image
-            BACKEND_EOF
+          BACKEND_EOF
           EOF
