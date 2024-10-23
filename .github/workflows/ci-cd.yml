@@ -41,8 +41,10 @@ jobs:
             $tempFile = "C:\Temp\commands.sh"
             $commands | Out-File -FilePath $tempFile -Encoding utf8
 
-            # Executando os comandos na VM do Frontend
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 2222 redes@127.0.0.1 "bash -s" < $tempFile
+            # Alternativa sem redirecionamento
+            $commandContent = Get-Content -Path $tempFile -Raw
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 2222 redes@127.0.0.1 "bash -s" $commandContent
+
 
             # Removendo o arquivo temporário (opcional)
             Remove-Item -Path $tempFile
