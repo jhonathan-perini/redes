@@ -41,14 +41,17 @@ jobs:
               scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 backend_image.tar.gz redes@192.168.56.102:/home/redes/backend/
               
               ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@192.168.56.102 << 'BACKEND_EOF'
+                echo "Parando o container existente, se estiver em execução..."
+                docker stop backend_container || true
+                echo "Removendo o container existente..."
+                docker rm backend_container || true  
                 echo "Criando diretório no backend..."
                 mkdir -p /home/redes/backend  
                 echo "Carregando e subindo o backend..."
                 cd /home/redes/backend
                 gunzip -c backend_image.tar.gz | docker load
                 echo "Executando o container..."
-                docker-compose down || true
-                docker-compose up -d
+                docker run -d --name backend_container -p 80:80 backend_image:latest
               BACKEND_EOF
               "@
         
