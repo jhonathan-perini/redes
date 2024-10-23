@@ -1,7 +1,7 @@
 # Dockerfile
 
 # Usando a imagem do Node.js
-FROM node:17 AS build
+FROM node:alpine AS build
 
 # Define o diretório de trabalho
 WORKDIR /app
