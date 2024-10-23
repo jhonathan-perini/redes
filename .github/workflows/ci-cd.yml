@@ -26,15 +26,15 @@ jobs:
             docker save backend_image:latest | gzip > backend_image.tar.gz
 
             echo "Criando diretório no backend..."
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@$192.168.56.102 << 'BACKEND_EOF'
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@192.168.56.102 << 'BACKEND_EOF'
               mkdir -p /home/redes/backend
             BACKEND_EOF
 
             echo "Transferindo imagem para o backend..."
-            scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 backend_image.tar.gz redes@$192.168.56.102:/home/redes/backend/
+            scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 backend_image.tar.gz redes@192.168.56.102:/home/redes/backend/
             
             echo "Carregando e subindo o backend..."
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@$192.168.56.102 << 'BACKEND_EOF'
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@192.168.56.102 << 'BACKEND_EOF'
               cd /home/redes/backend
               gunzip -c backend_image.tar.gz | docker load
 
