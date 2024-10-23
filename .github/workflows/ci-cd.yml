@@ -29,22 +29,11 @@ jobs:
             # Comandos a serem executados na VM do Frontend
             $commands = @"
             echo "Construindo a imagem Docker do backend..."
-            mkdir -p /home/john/redes/backend
-            cd /home/john/redes/backend
-
-            echo "Salvando a imagem como .tar..."
-
+            cd /home/john/redes/frontend  # Caminho corrigido 
+            docker-compose down || true
+            docker-compose up -d --build 
             
             "@
 
-            # Salvando os comandos em um arquivo temporário com a codificação correta
-            $tempFile = "C:\Users\jperini\OneDrive - Padtec\Documents\commands.sh"
-            $commands | Out-File -FilePath $tempFile -Encoding utf8
-
-            # Alternativa sem redirecionamento
-            $commandContent = Get-Content -Path $tempFile -Raw
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 2222 redes@127.0.0.1 "bash -s" $commandContent
-
-
-            # Removendo o arquivo temporário (opcional)
-            Remove-Item -Path $tempFile
+            # Executando os comandos na VM do Frontend
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@127.0.0.1 $commands
