@@ -32,17 +32,17 @@ jobs:
       #     scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ./ ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/redes/redes
       - name: Deploy Frontend and Trigger Backend Deploy
         run: |
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} <<'EOF'
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} <<EOF
             echo "Iniciando deploy do frontend..."
            
       
             echo "Conectando ao backend..."
-            ssh -o StrictHostKeyChecking=no  -p 22 ${{ secrets.BACKEND_VM_USER }}@${{ secrets.BACKEND_VM_IP }} <<'BACKEND_EOF'
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.BACKEND_VM_USER }}@${{ secrets.BACKEND_VM_IP }} <<'BACKEND_EOF'
               echo "Criando diretório no backend..."
               mkdir -p /home/redes/backend
       
               echo "Copiando arquivos do frontend para o backend..."
-              scp -o StrictHostKeyChecking=no -P 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/redes/redes/backend/* /home/redes/backend/
+              scp  -P 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/redes/redes/backend/* /home/redes/backend/
       
               echo "Subindo o backend..."
               cd /home/redes/backend  # Caminho corrigido
