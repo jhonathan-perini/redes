@@ -17,47 +17,47 @@ jobs:
               mkdir -p ~/.ssh
               echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_rsa
               chmod 600 ~/.ssh/id_rsa
-
+              echo "${{ secrets.VM_SSH_KEY }}"
       - name: Add Frontend VM to Known Hosts
         run: |
               ssh-keyscan -p 22 -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy Frontend
-        run: |
-              ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
-                mkdir -p /home/john/redes
-              EOF
+      # - name: Deploy Frontend
+      #   run: |
+      #         ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'EOF'
+      #           mkdir -p /home/john/redes
+      #         EOF
 
-              scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ./ ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/redes
+      #         scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 ./ ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/john/redes
 
-      - name: Build Backend Docker Image on Frontend VM
-        run: |
-          echo "Conectando à VM do frontend..."
-          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@127.0.0.1 << EOF
+      # - name: Build Backend Docker Image on Frontend VM
+      #   run: |
+      #     echo "Conectando à VM do frontend..."
+      #     ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@127.0.0.1 << EOF
             
-            echo "Construindo a imagem Docker do backend..."
-            cd /home/john/redes/backend
+      #       echo "Construindo a imagem Docker do backend..."
+      #       cd /home/john/redes/backend
             
 
-            echo "Salvando a imagem como .tar..."
+      #       echo "Salvando a imagem como .tar..."
            
 
            
-            echo "${{ secrets.FRONTEND_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
-            chmod 600 ~/.ssh/id_rsa
+      #       echo "${{ secrets.FRONTEND_SSH_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+      #       chmod 600 ~/.ssh/id_rsa
             
           
          
-            echo "Transferindo imagem para o backend..."
+      #       echo "Transferindo imagem para o backend..."
             
-            echo "Carregando e subindo o backend..."
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@192.168.56.102 << 'BACKEND_EOF'
-              cd /home/redes/backend
+      #       echo "Carregando e subindo o backend..."
+      #       ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@192.168.56.102 << 'BACKEND_EOF'
+      #         cd /home/redes/backend
 
-              docker stop backend_container || true
-              docker rm backend_container || true
+      #         docker stop backend_container || true
+      #         docker rm backend_container || true
 
-              echo "Executando o novo container..."
-              docker run -d --name backend_container -p 80:80 backend_image
-          BACKEND_EOF
-          EOF
+      #         echo "Executando o novo container..."
+      #         docker run -d --name backend_container -p 80:80 backend_image
+      #     BACKEND_EOF
+      #     EOF
