@@ -37,16 +37,19 @@ jobs:
               docker build -t backend_image:latest .
               echo "Salvando a imagem como .tar..."
               docker save backend_image:latest | gzip > backend_image.tar.gz
-              echo "Criando diretório no backend..."
-              mkdir -p /home/redes/backend
               echo "Transferindo imagem para o backend..."
               scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 backend_image.tar.gz redes@192.168.56.102:/home/redes/backend/
-              echo "Carregando e subindo o backend..."
-              cd /home/redes/backend
-              gunzip -c backend_image.tar.gz | docker load
-              echo "Executando o container..."
-              docker-compose down || true
-              docker-compose up -d
+              
+              ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@192.168.56.102 << 'BACKEND_EOF'
+                echo "Criando diretório no backend..."
+                mkdir -p /home/redes/backend  
+                echo "Carregando e subindo o backend..."
+                cd /home/redes/backend
+                gunzip -c backend_image.tar.gz | docker load
+                echo "Executando o container..."
+                docker-compose down || true
+                docker-compose up -d
+              BACKEND_EOF
               "@
         
               # Remover caracteres de retorno de carro
