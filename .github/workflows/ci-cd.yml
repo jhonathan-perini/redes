@@ -37,4 +37,4 @@ jobs:
             "@
 
             # Executando os comandos na VM do Frontend
-            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 22 redes@127.0.0.1 $commands
+            ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 2222 redes@127.0.0.1 $commands
