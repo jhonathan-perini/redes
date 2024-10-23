@@ -17,8 +17,7 @@ jobs:
         run: |
           $sshCommand = "ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -p 2222"
           $scpCommand = "scp -r -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 2222"
-      
-  
+
           # Remover o diretório na VM antes de copiar
           Invoke-Expression "$sshCommand ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} 'rm -rf /home/john/redes && mkdir -p /home/john/redes'"
 
