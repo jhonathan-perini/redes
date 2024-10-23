@@ -5,7 +5,7 @@ import pgPromise from 'pg-promise';
 const pgp = pgPromise();
 
 const initDb = () => {
-  const db = pgp(process.env.POSTGRES_URI);
+  const db = pgp('postgres://user:password@db:5432/yourdbname');
   return db;
 };
 
