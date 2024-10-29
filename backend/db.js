@@ -5,7 +5,7 @@ import pg from 'pg';
 
 const {Pool} = pg
 const pool = new Pool({
-  host: 'db_container',
+  host: 'localhost',
   user: 'user',
   password: 'password',
   database: 'estoque',
