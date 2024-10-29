@@ -7,7 +7,7 @@ FROM postgres:13
 # Defina variáveis de ambiente para configuração do banco de dados
 ENV POSTGRES_USER=user
 ENV POSTGRES_PASSWORD=password
-ENV POSTGRES_DB=yourdbname
+ENV POSTGRES_DB=estoque
 
 # Exponha a porta do PostgreSQL
 EXPOSE 5432
