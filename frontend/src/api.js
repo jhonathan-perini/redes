@@ -3,7 +3,7 @@
 import axios from 'axios';
 
 const mode = import.meta.env
-const baseURL = 'http://192.168.56.102:5000/api/'
+const baseURL = 'http://192.168.56.102:5000/api'
  const api = axios.create({
     baseURL,
     timeout: 100000,

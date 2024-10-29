@@ -57,6 +57,7 @@ jobs:
                 echo "Removendo o container existente..."
                 docker rm backend_container || true  
                 docker rm db_container || true  
+                docker network create my_custom_network || true
                 echo "Criando diretório no backend..."
                 mkdir -p /home/redes/backend  
                 echo "Carregando e subindo o backend..."
@@ -64,8 +65,8 @@ jobs:
                 gunzip -c backend_image.tar.gz | docker load
                 gunzip -c backend_db.tar.gz | docker load
                 echo "Executando o container..."
-                docker run -d --name backend_container -p 5000:5000 backend_image:latest
-                docker run -d --name db_container -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -e POSTGRES_DB=estoque -p 5432:5432 -v postgres_data:/var/lib/postgresql/data backend_db:latest 
+                docker run -d --name backend_container -p 5000:5000 --network my_custom_network backend_image:latest
+                docker run -d --name db_container --network my_custom_network -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -e POSTGRES_DB=estoque -p 5432:5432 -v postgres_data:/var/lib/postgresql/data backend_db:latest 
               BACKEND_EOF
               "@
         
