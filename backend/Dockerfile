@@ -1,5 +1,5 @@
 # Fase de construção
-FROM node:17 AS build
+FROM node:alpine AS build
 
 # Define o diretório de trabalho
 WORKDIR /usr/src/app
@@ -14,7 +14,7 @@ RUN npm install
 # Compila a aplicação (caso necessário)
 
 # Fase de produção
-FROM node:17 AS production
+FROM node:alpine AS production
 
 # Define o diretório de trabalho
 WORKDIR /usr/src/app

@@ -1,12 +1,15 @@
 // db.js
 
-import pgPromise from 'pg-promise';
+import pg from 'pg';
 
-const pgp = pgPromise();
 
-const initDb = () => {
-  const db = pgp('postgres://user:password@db:5432/yourdbname');
-  return db;
-};
+const {Pool} = pg
+const pool = new Pool({
+  host: 'localhost',
+  user: 'postgres',
+  password: 'postgres',
+  database: 'estoque',
+  port: 5432,
+});
 
-export default initDb;
+export default pool;
