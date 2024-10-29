@@ -28,7 +28,9 @@ jobs:
         run: |
               # Comandos a serem executados na VM do Frontend
               $commands = @"
-            
+              echo "Construindo a imagem Docker do frontend..."
+              cd /home/john/redes/frontend
+              docker build -t frontend_image:latest .
               echo "Construindo a imagem Docker do backend..."
               cd /home/john/redes/backend
               docker build -t backend_image:latest .
@@ -37,6 +39,14 @@ jobs:
               echo "Salvando as imagens como .tar..."
               docker save backend_image:latest | gzip > backend_image.tar.gz
               docker save backend_db:latest | gzip > backend_db.tar.gz
+              docker save frontend_image:latest | gzip > frontend_image.tar.gz
+              echo "Parando o container existente, se estiver em execução..."
+                docker stop frontend_container || true
+                echo "Removendo o container existente..."
+                docker rm frontend_container || true  
+                gunzip -c frontend_image.tar.gz | docker load
+                echo "Executando o container..."
+                docker run -d --name frontend_container -p 3000:80 frontend_image:latest  
               echo "Transferindo imagens para o backend..."
               scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 backend_image.tar.gz backend_db.tar.gz redes@192.168.56.102:/home/redes/backend/
               
