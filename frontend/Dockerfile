@@ -14,7 +14,7 @@ RUN npm install
 COPY . .
 
 # Compila a aplicação
-
+# RUN npm run build
 
 # Fase de produção
 # FROM nginx:alpine
@@ -23,7 +23,7 @@ COPY . .
 # COPY --from=build /app/dist /usr/share/nginx/html
 
 # Expondo a porta
-EXPOSE 80
+EXPOSE 3000
 
 # Comando para iniciar o nginx
 CMD ["npm", "run", "dev"]
