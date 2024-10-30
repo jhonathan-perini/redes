@@ -46,7 +46,7 @@ jobs:
                 docker rm frontend_container || true  
                 gunzip -c frontend_image.tar.gz | docker load
                 echo "Executando o container..."
-                docker run -d --name frontend_container -p 3000:80 frontend_image:latest  
+                docker run -d --name  --cpus="1" frontend_container -p 3000:80 frontend_image:latest  
               echo "Transferindo imagens para o backend..."
               scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 backend_image.tar.gz backend_db.tar.gz redes@192.168.56.102:/home/redes/backend/
               
@@ -65,8 +65,8 @@ jobs:
                 gunzip -c backend_image.tar.gz | docker load
                 gunzip -c backend_db.tar.gz | docker load
                 echo "Executando o container..."
-                docker run -d --name backend_container -p 5000:5000 --network my_custom_network backend_image:latest
-                docker run -d --name db_container --network my_custom_network -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -e POSTGRES_DB=estoque -p 5432:5432 -v postgres_data:/var/lib/postgresql/data backend_db:latest 
+                docker run -d --name backend_container  --cpus="0.5" -p 5000:5000 --network my_custom_network backend_image:latest
+                docker run -d --name db_container  --cpus="0.5" --network my_custom_network -e POSTGRES_USER=user -e POSTGRES_PASSWORD=password -e POSTGRES_DB=estoque -p 5432:5432 -v postgres_data:/var/lib/postgresql/data backend_db:latest 
               BACKEND_EOF
               "@
         
