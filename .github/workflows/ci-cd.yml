@@ -46,7 +46,7 @@ jobs:
                 docker rm frontend_container || true  
                 gunzip -c frontend_image.tar.gz | docker load
                 echo "Executando o container..."
-                docker run -d --name frontend_container -p 80:80 frontend_image:latest  
+                docker run -d --name frontend_container -p 3000:80 frontend_image:latest  
               echo "Transferindo imagens para o backend..."
               scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -P 22 backend_image.tar.gz backend_db.tar.gz redes@192.168.56.102:/home/redes/backend/
               
