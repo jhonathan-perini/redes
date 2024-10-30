@@ -33,7 +33,7 @@ jobs:
               docker build -t frontend_image:latest .
               echo "Construindo a imagem Docker do backend..."
               cd /home/john/redes/backend
-              docker build -t backend_image:latest .
+              docker build -t backend_image:latest . 
               echo "Construindo a imagem Docker do db..."
               docker build -t backend_db -f Dockerfile.db . 
               echo "Salvando as imagens como .tar..."
@@ -44,7 +44,7 @@ jobs:
                 docker stop frontend_container || true
                 echo "Removendo o container existente..."
                 docker rm frontend_container || true  
-                gunzip -c frontend_image.tar.gz | docker load
+                gunzip -c frontend_image.tar.gz | docker load  
                 echo "Executando o container..."
                 docker run -d --name  frontend_container  --cpus="1" -p 3000:80 frontend_image:latest  
               echo "Transferindo imagens para o backend..."
